@@ -1,0 +1,122 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="login-view">
+    <!-- HTML, CSS Styles -->
+    <template>
+        <style>
+            :host {
+                background-color: #2f3239;
+                height: 100%;
+                display: block;
+            }
+            paper-input {
+                --paper-input-container-focus-color: #d82521;
+            }
+            paper-input iron-icon {
+                margin-right: 4px;
+                color: rgba(0,0,0,0.3);
+            }
+            paper-material {
+                width: 430px;
+                height: 384px;
+                background-color: #fff;
+                border-radius: 8px;
+            }
+            h3 {
+                margin: 40px 0 0;
+                font-size: 24px;
+                text-align: center;
+            }
+            .flex-center-justified {
+                @apply(--layout-horizontal);
+                @apply(--layout-center-justified);
+            }
+            .logo {
+                margin: 40px 0;
+            }
+            .form {
+                padding: 40px;
+            }
+            .active {
+                color: #d82521 !important;
+            }
+            #login_btn {
+                width: 100%;
+                margin-top: 16px;
+                background-color: #d82521;
+                color: #fff;
+            }
+        </style>
+        <div class="flex-center-justified">
+            <img class="logo" src="../../images/logo.jpg" alt="">
+        </div>
+        <div class="flex-center-justified">
+            <paper-material elevation="2">
+                <h3 class="header">Log in to your account</h3>
+                <div class="form">
+                    <paper-input 
+                        label="Username" 
+                        id="username_input" 
+                        on-focus="_highlightIcon"
+                        on-blur="_checkHighlight">
+                        <iron-icon icon="account-box" prefix></iron-icon>
+                    </paper-input>
+
+                    <paper-input 
+                        label="Password" 
+                        type="password" 
+                        id="password_input" 
+                        on-focus="_highlightIcon"
+                        on-blur="_checkHighlight">
+                        <iron-icon icon="icons:lock" prefix></iron-icon>
+                    </paper-input>
+
+                    <paper-button raised id="login_btn">Log In</paper-button>
+                </div>
+                    
+            </paper-material>
+        </div>  
+    </template>
+
+    <!-- Javascript -->
+    <script>
+        Polymer({
+            is: 'login-view',
+
+            properties: {
+                username: {
+                    type   : String,
+                    notify : true,
+                    value  : ''
+                },
+                password: {
+                    type   : String,
+                    notify : true,
+                    value  : ''
+                }
+            },
+
+            _highlightIcon: function(e) {
+                var input = e.currentTarget;
+                input.querySelector('iron-icon').toggleClass('active', true);
+            },
+
+            _checkHighlight: function(e) {
+                var input = e.currentTarget;
+                if (input.value) {
+                    input.querySelector('iron-icon').toggleClass('active', true);
+                } else {
+                    input.querySelector('iron-icon').toggleClass('active', false);
+                }
+            }
+
+        });
+    </script>
+</dom-module>
