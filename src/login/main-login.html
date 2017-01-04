@@ -1,0 +1,68 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-from-right-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-left-animation.html">
+
+<link rel="import" href="login.html">
+<link rel="import" href="sign-up.html">
+<link rel="import" href="forgot-password.html">
+
+<dom-module id="main-login">
+    <!-- HTML, CSS Styles -->
+    <template>
+        <style>
+            :host {
+                background-color: #2f3239;
+                height: 100%;
+                display: block;
+                padding-bottom: 64px;
+            }
+            .flex-center-justified {
+                @apply(--layout-horizontal);
+                @apply(--layout-center-justified);
+            }
+            .flex {
+                @apply(--layout-flex);
+            }
+            .logo {
+                margin: 40px 0;
+            }
+        </style>
+
+        <div class="flex-center-justified">
+            <img class="logo" src="../../images/logo.jpg" alt="">
+        </div>
+        <neon-animated-pages
+                id="login_pages"
+                class="flex"
+                selected="[[selectedPage]]"
+                attr-for-selected="id"
+                entry-animation="slide-from-right-animation"
+                exit-animation="slide-left-animation">
+
+            <login-view id="login_page" selected-page="{{selectedPage}}"></login-view>
+
+            <sign-up id="sign_up_page" selected-page="{{selectedPage}}"></sign-up>
+
+            <forgot-password id="forgot_password_page" selected-page="{{selectedPage}}"></forgot-password>
+        </neon-animated-pages>
+
+    </template>
+
+    <!-- Javascript -->
+    <script>
+        Polymer({
+            is: 'main-login',
+
+            properties: {
+                selectedPage: {
+                    type   : String,
+                    notify : true,
+                    value  : 'login_page'
+                }
+            }
+        });
+    </script>
+</dom-module>
