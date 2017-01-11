@@ -66,23 +66,30 @@
                 <h3 class="header">Log in to your account</h3>
                 <div class="form">
                     <paper-input
-                            label="Username"
                             id="username_input"
+                            label="Username"
+                            value="{{username}}"
                             on-focus="_highlightIcon"
-                            on-blur="_checkHighlight">
+                            on-blur="_checkHighlight"
+                            required
+                            error-message="Invalid username.">
                         <iron-icon icon="account-box" prefix></iron-icon>
                     </paper-input>
 
                     <paper-input
+                            id="password_input"
                             label="Password"
                             type="password"
-                            id="password_input"
+                            value="{{password}}"
                             on-focus="_highlightIcon"
-                            on-blur="_checkHighlight">
+                            on-blur="_checkHighlight"
+                            required
+                            error-message="Invalid password.">
                         <iron-icon icon="icons:lock" prefix></iron-icon>
                     </paper-input>
 
-                    <paper-button raised id="login_btn">Log In</paper-button>
+                    <paper-button raised id="login_btn" on-tap="_login">Log In</paper-button>
+
                     <div class="flex-horizontal">
                         <a class="flex" href="javascript:void(0)" on-tap="_signUp">Sign Up</a>
                         <a href="javascript:void(0)" on-tap="_forgotPassword">Forgot your Password?</a>
@@ -126,6 +133,15 @@
                     input.querySelector('iron-icon').toggleClass('active', true);
                 } else {
                     input.querySelector('iron-icon').toggleClass('active', false);
+                }
+            },
+
+            _login: function() {
+                this.$$('#username_input').validate();
+                this.$$('#password_input').validate();
+
+                if ( this.get('username') && this.get('password') ) {
+                    console.log('User is logged in');
                 }
             },
 
