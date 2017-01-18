@@ -68,55 +68,87 @@
                 <div class="form">
                     <div class="flex-horizontal">
                         <paper-input
-                                label="First Name"
                                 id="first_name_input"
+                                class="validatable"
+                                label="First Name"
+                                value="{{firstName}}"
                                 on-focus="_highlightIcon"
-                                on-blur="_checkHighlight">
+                                on-blur="_checkHighlight"
+                                auto-validate
+                                required
+                                error-message="Required field!">
                             <iron-icon icon="account-box" prefix></iron-icon>
                         </paper-input>
 
                         <paper-input
-                                label="Last Name"
                                 id="last_name_input"
+                                class="validatable"
+                                label="Last Name"
+                                value="{{lastName}}"
                                 on-focus="_highlightIcon"
-                                on-blur="_checkHighlight">
+                                on-blur="_checkHighlight"
+                                auto-validate
+                                required
+                                error-message="Required field!">
                             <iron-icon icon="account-box" prefix></iron-icon>
                         </paper-input>
                     </div>
                     <paper-input
-                            label="Username"
                             id="username_input"
-                            placeholder="example@example.com"
+                            class="validatable"
+                            label="Username"
+                            value="{{username}}"
+                            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}"
                             on-focus="_highlightIcon"
-                            on-blur="_checkHighlight">
+                            on-blur="_checkHighlight"
+                            auto-validate
+                            required
+                            error-message="Invalid Email!">
                         <iron-icon icon="mail" prefix></iron-icon>
                     </paper-input>
 
                     <paper-input
+                            id="password_input"
+                            class="validatable"
                             label="Password"
                             type="password"
-                            id="password_input"
+                            value="{{password}}"
                             on-focus="_highlightIcon"
-                            on-blur="_checkHighlight">
+                            on-blur="_checkHighlight"
+                            auto-validate
+                            required
+                            error-message="Required field!">
                         <iron-icon icon="icons:lock" prefix></iron-icon>
                     </paper-input>
                     <paper-input
+                            id="password_confirm_input"
+                            class="validatable"
                             label="Confirm your password"
                             type="password"
-                            id="password_confirm_input"
+                            value="{{confirmPassword}}"
                             on-focus="_highlightIcon"
-                            on-blur="_checkHighlight">
+                            on-blur="_checkHighlight"
+                            auto-validate
+                            required
+                            error-message="Required field!">
                         <iron-icon icon="icons:lock" prefix></iron-icon>
                     </paper-input>
                     <paper-input
-                            label="Phone"
                             id="phone_input"
+                            class="validatable"
+                            label="Phone"
+                            type="number"
+                            value="{{phoneNumber}}"
                             on-focus="_highlightIcon"
-                            on-blur="_checkHighlight">
+                            on-blur="_checkHighlight"
+                            auto-validate
+                            required
+                            error-message="Required field!">
                         <iron-icon icon="settings-cell" prefix></iron-icon>
                     </paper-input>
 
-                    <paper-button raised id="login_btn">Create Account</paper-button>
+                    <paper-button raised id="login_btn" on-tap="_signUp">Create Account</paper-button>
+
                     <div class="flex-center-justified">
                         <a class="flex" href="javascript:void(0)" on-tap="_login">Login</a>
                     </div>
@@ -131,16 +163,48 @@
             is: 'sign-up',
 
             properties: {
+                firstName: {
+                    type   : String,
+                    notify : true,
+                    value  : ''
+                },
+                lastName: {
+                    type   : String,
+                    notify : true,
+                    value  : ''
+                },
+                username: {
+                    type   : String,
+                    notify : true,
+                    value  : ''
+                },
+                password: {
+                    type   : String,
+                    notify : true,
+                    value  : ''
+                },
+                confirmPassword: {
+                    type   : String,
+                    notify : true,
+                    value  : ''
+                },
+                phoneNumber: {
+                    type   : Number,
+                    notify : true,
+                    value  : ''
+                },
                 selectedPage: {
                     type   : String,
                     notify : true,
                     value  : ''
                 }
             },
+
             _highlightIcon: function(e) {
                 var input = e.currentTarget;
                 input.querySelector('iron-icon').toggleClass('active', true);
             },
+
             _checkHighlight: function(e) {
                 var input = e.currentTarget;
                 if (input.value) {
@@ -149,6 +213,30 @@
                     input.querySelector('iron-icon').toggleClass('active', false);
                 }
             },
+
+            _signUp: function() {
+                var errors = 0,
+                    inputs = Polymer.dom(this.root).querySelectorAll('.validatable');
+                inputs.forEach(function (input) {
+                    input.validate();
+                    if ( input.invalid ) {
+                        errors++;
+                    }
+                });
+                if (this.password && this.confirmPassword && this.password !== this.confirmPassword){
+                    errors++;
+                    this.$$('#password_input').errorMessage = 'Please make sure your passwords match';
+                    this.$$('#password_input').invalid = true;
+                    this.$$('#password_confirm_input').errorMessage = 'Please make sure your passwords match';
+                    this.$$('#password_confirm_input').invalid = true;
+                }
+
+                if ( errors === 0 ) {
+
+                    console.log('User Created');
+                }
+            },
+
             _login: function() {
                 this.set('selectedPage', 'login_page');
             }
