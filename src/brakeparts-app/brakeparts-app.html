@@ -1,0 +1,50 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../login/main-login.html">
+<link rel="import" href="../bp-navigation/bp-navigation.html">
+
+<dom-module id="brakeparts-app">
+    <!-- HTML, CSS Styles -->
+    <template>
+        <style>
+
+        </style>
+
+        <!-- Login Page -->
+        <template is="dom-if" if="[[!isLoggedIn]]">
+            <main-login></main-login>
+        </template>
+
+        <!-- Navigation element -->
+        <template is="dom-if" if="[[isLoggedIn]]">
+            <bp-navigation
+                    id="bp_navigation">
+            </bp-navigation>
+        </template>
+    </template>
+
+    <!-- Javascript -->
+    <script>
+        Polymer({
+            is: 'brakeparts-app',
+
+            properties: {
+                isLoggedIn: {
+                    type   : Boolean,
+                    notify : true,
+                    value  : false
+                }
+            },
+
+            listeners: {
+                'bp-authentication-success': '_handleAuthenticationSuccess'
+            },
+
+            _handleAuthenticationSuccess: function(e) {
+                this.set("isLoggedIn", true);
+                console.log(e.detail.user);
+            }
+
+        });
+    </script>
+</dom-module>

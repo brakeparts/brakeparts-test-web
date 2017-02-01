@@ -142,6 +142,9 @@
 
                 if ( this.get('username') && this.get('password') ) {
                     console.log('User is logged in');
+                    this.fire('bp-authentication-success', {
+                        user : this.get('username')
+                    });
                 }
             },
 
