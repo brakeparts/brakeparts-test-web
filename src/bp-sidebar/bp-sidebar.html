@@ -1,0 +1,61 @@
+<!-- Import elements -->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<!-- Define Polymer Element -->
+<dom-module id="bp-sidebar">
+    <!-- HTML, CSS Styles -->
+    <template>
+        <style is="custom-style">
+            paper-card {
+                width: 200px;
+                --paper-card-header: {
+                    background-color: red;
+                    color: white;
+                    height: 50px;
+                };
+                --paper-card-header-text: {
+                    padding: 8px;
+                    text-align: center;
+                }
+            }
+
+        </style>
+        <div class="vertical layout">
+            <paper-card heading="Groups">
+                <div class="card-content">
+                    <paper-item>ORINGS</paper-item>
+                    <paper-item>RETENES</paper-item>
+                    <paper-item>FRENOS</paper-item>
+                </div>
+            </paper-card>
+            <paper-card heading="Groups">
+                 <div role="listbox">
+                    <a class="paper-item-link" href="#inbox" tabindex="-1">
+                        <paper-item>Inbox</paper-item>
+                    </a>
+                    <a class="paper-item-link" href="#starred" tabindex="-1">
+                        <paper-item>Starred</paper-item>
+                    </a>
+                    <a class="paper-item-link" href="#sent" tabindex="-1">
+                        <paper-item>Sent mail</paper-item>
+                    </a>
+                    </div>
+
+            </paper-card>
+        </div>
+    </template>
+
+    <!-- Javascript -->
+    <script>
+        Polymer({
+            is: 'bp-sidebar',
+
+            properties: {
+
+            }
+
+        });
+    </script>
+</dom-module>
