@@ -48,6 +48,11 @@
                 margin-right: 8px;
                 color: #db4437;
             }
+            .card-actions{
+                text-align: center;
+                color:#db4437;
+                font-weight: bold;
+            }
 
         </style>
         <div class="vertical layout">
@@ -67,7 +72,17 @@
             <paper-card heading="Busqueda">
                 <div>
                     <eip-autocomplete-input
-                            id="phone_number_select"
+                            id="grupo_repuestos"
+                            label="Grupo"
+                            list="[[_mapPhoneNumberList(phoneNumberList.*, currentLocation.groupId)]]"
+                            value="{{value}}"
+                            search-text="[[value]]"
+                            selected-item="[[value]]"
+                            always-float-label
+                            show-clear>
+                    </eip-autocomplete-input>
+                    <eip-autocomplete-input
+                            id="marca_vehiculo"
                             label="Marca"
                             list="[[_mapPhoneNumberList(phoneNumberList.*, currentLocation.groupId)]]"
                             value="{{value}}"
@@ -76,9 +91,32 @@
                             always-float-label
                             show-clear>
                     </eip-autocomplete-input>
+                    <eip-autocomplete-input
+                            id="modelo_vehiculo"
+                            label="Modelo"
+                            list="[[_mapPhoneNumberList(phoneNumberList.*, currentLocation.groupId)]]"
+                            value="{{value}}"
+                            search-text="[[value]]"
+                            selected-item="[[value]]"
+                            always-float-label
+                            show-clear>
+                    </eip-autocomplete-input>
+                    <eip-autocomplete-input
+                            id="anio"
+                            label="Año"
+                            list="[[_mapPhoneNumberList(phoneNumberList.*, currentLocation.groupId)]]"
+                            value="{{value}}"
+                            search-text="[[value]]"
+                            selected-item="[[value]]"
+                            always-float-label
+                            show-clear>
+                    </eip-autocomplete-input>
+                    <div class="card-actions">
+                        <paper-button style="margin-right: 16px;">Buscar</paper-button>
+                        <paper-button>Limpiar</paper-button>
+                    </div>
                 </div>
             </paper-card>
-
 
             <paper-card heading="Contactanos">
                 <div class="card-content">
