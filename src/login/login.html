@@ -43,7 +43,6 @@
             .flex {
                 @apply(--layout-flex);
             }
-
             .form {
                 padding: 40px;
             }
@@ -141,7 +140,6 @@
                 this.$$('#password_input').validate();
 
                 if ( this.get('username') && this.get('password') ) {
-                    console.log('User is logged in');
                     this.fire('bp-authentication-success', {
                         user : this.get('username')
                     });
@@ -151,8 +149,15 @@
             _signUp: function() {
                 this.set('selectedPage', 'sign_up_page');
             },
+
             _forgotPassword: function() {
                 this.set('selectedPage', 'forgot_password_page');
+            },
+
+            attached: function() {
+                this.fire('bp-authentication-success', {
+                    user : this.get('username')
+                });
             }
 
         });

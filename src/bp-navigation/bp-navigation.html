@@ -1,17 +1,83 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
 <link rel="import" href="../bp-home/bp-home.html">
 <link rel="import" href="../bp-sidebar/bp-sidebar.html">
-<link rel="import" href="../eip-autocomplete-input/eip-autocomplete-input.html">
-
 
 <dom-module id="bp-navigation">
     <!-- HTML, CSS Styles -->
     <template>
-        <style>
+        <style is="custom-style">
+            app-header {
+                background-color: #db4437;
+                color: #fff;
+            }
+            app-header paper-icon-button {
+                --paper-icon-button-ink-color: #fff;
+            }
+            app-drawer-layout {
+                --app-drawer-layout-content-transition: margin 0.2s;
+            }
+            app-drawer {
+                --app-drawer-content-container: {
+                    background-color: #eee;
+                }
+            }
+            .drawer-content {
+                margin-top: 80px;
+                height: calc(100% - 100px);
+                overflow: auto;
+                margin-left: 16px;
+            }
+            ::-webkit-scrollbar {
+                width: 5px;
+            }
 
+            /* Track */
+            ::-webkit-scrollbar-track {
+                -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+                -webkit-border-radius: 10px;
+                border-radius: 10px;
+            }
+
+            /* Handle */
+            ::-webkit-scrollbar-thumb {
+                -webkit-border-radius: 10px;
+                border-radius: 10px;
+                background: rgba(255,0,0,0.8);
+                -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+            }
+            ::-webkit-scrollbar-thumb:window-inactive {
+                background: rgba(255,0,0,0.4);
+            }
         </style>
-        <bp-sidebar></bp-sidebar>
-        <bp-home></bp-home>
+
+        <app-header-layout>
+            <app-header fixed effects="waterfall" slot="header">
+                <app-toolbar>
+                    <paper-icon-button id="toggle" icon="menu" on-tap="_toggleSidebar"></paper-icon-button>
+                    <div main-title>BrakeParts</div>
+                </app-toolbar>
+            </app-header>
+
+            <app-drawer-layout id="drawerLayout">
+                <app-drawer slot="drawer">
+                    <div class="drawer-content">
+                        <bp-sidebar></bp-sidebar>
+                    </div>
+                </app-drawer>
+
+                <bp-home></bp-home>
+            </app-drawer-layout>
+        </app-header-layout>
     </template>
 
     <!-- Javascript -->
@@ -21,6 +87,15 @@
 
             properties: {
 
+            },
+
+            _toggleSidebar: function() {
+                const drawerLayout = this.$.drawerLayout;
+                if (drawerLayout.forceNarrow || !drawerLayout.narrow) {
+                    drawerLayout.forceNarrow = !drawerLayout.forceNarrow;
+                } else {
+                    drawerLayout.drawer.toggle();
+                }
             }
 
         });
