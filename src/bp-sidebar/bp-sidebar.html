@@ -5,30 +5,35 @@
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 
-
+<link rel="import" href="../eip-autocomplete-input/eip-autocomplete-input.html">
 
 <!-- Define Polymer Element -->
 <dom-module id="bp-sidebar">
     <!-- HTML, CSS Styles -->
     <template>
         <style is="custom-style" include="iron-flex">
+            paper-button {
+                padding: 4px;
+                font-size: 15px;
+            }
             paper-card {
-                width: 300px;
+                width: 216px;
                 margin-bottom: 16px;
                 font-family: Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
                 --paper-card-header: {
                     background-color: #db4437;
-                    color: white;
-                    height: 60px;
-                    font-family: Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
+                    height: 48px;
                 };
                 --paper-card-header-text: {
-                    padding: 8px;
                     text-align: center;
-                    color: white;
+                    color: #fff;
+                    font-size: 18px;
+                    text-transform: uppercase;
+                    padding: 10px;
                 }
 
             }
@@ -38,8 +43,11 @@
                 justify-content: center;
 
             }
-            .paper-item-link{
-                text-decoration: none;
+            .card-actions {
+                padding: 8px 0 0 0!important;
+                text-align: center;
+                color:#db4437;
+                font-weight: bold;
             }
             .no-padding {
                 padding: 0;
@@ -47,6 +55,9 @@
             .no-padding iron-icon {
                 margin-right: 8px;
                 color: #db4437;
+            }
+            .paper-item-link{
+                text-decoration: none;
             }
 
         </style>
@@ -67,7 +78,17 @@
             <paper-card heading="Busqueda">
                 <div class="card-content">
                     <eip-autocomplete-input
-                            id="phone_number_select"
+                            id="group_autocomplete"
+                            label="Grupo"
+                            list="[[_mapPhoneNumberList(phoneNumberList.*, currentLocation.groupId)]]"
+                            value="{{value}}"
+                            search-text="[[value]]"
+                            selected-item="[[value]]"
+                            always-float-label
+                            show-clear>
+                    </eip-autocomplete-input>
+                    <eip-autocomplete-input
+                            id="brand_autocomplete"
                             label="Marca"
                             list="[[_mapPhoneNumberList(phoneNumberList.*, currentLocation.groupId)]]"
                             value="{{value}}"
@@ -76,6 +97,30 @@
                             always-float-label
                             show-clear>
                     </eip-autocomplete-input>
+                    <eip-autocomplete-input
+                            id="model_autocomplete"
+                            label="Modelo"
+                            list="[[_mapPhoneNumberList(phoneNumberList.*, currentLocation.groupId)]]"
+                            value="{{value}}"
+                            search-text="[[value]]"
+                            selected-item="[[value]]"
+                            always-float-label
+                            show-clear>
+                    </eip-autocomplete-input>
+                    <eip-autocomplete-input
+                            id="year_autcomplete"
+                            label="Año"
+                            list="[[_mapPhoneNumberList(phoneNumberList.*, currentLocation.groupId)]]"
+                            value="{{value}}"
+                            search-text="[[value]]"
+                            selected-item="[[value]]"
+                            always-float-label
+                            show-clear>
+                    </eip-autocomplete-input>
+                    <div class="card-actions">
+                        <paper-button>Buscar</paper-button>
+                        <paper-button>Limpiar</paper-button>
+                    </div>
                 </div>
             </paper-card>
 
