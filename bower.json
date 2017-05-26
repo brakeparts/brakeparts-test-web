@@ -9,7 +9,7 @@
     "app-route": "PolymerElements/app-route#^0.9.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "iron-icon": "PolymerElements/iron-icon#^1.0.0",
-    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.0.0",
+    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^2.0.0",
     "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.0",
     "iron-media-query": "PolymerElements/iron-media-query#^1.0.0",
     "iron-pages": "PolymerElements/iron-pages#^1.0.0",
@@ -21,7 +21,9 @@
     "iron-icons": "PolymerElements/iron-icons#^1.2.0",
     "neon-animation": "PolymerElements/neon-animation#^1.2.4",
     "paper-card": "PolymerElements/paper-card#^1.1.4",
-    "paper-item": "PolymerElements/paper-item#^2.0.0"
+    "paper-item": "PolymerElements/paper-item#^2.0.0",
+    "iron-list": "PolymerElements/iron-list#^2.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

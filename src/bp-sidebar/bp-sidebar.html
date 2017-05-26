@@ -2,48 +2,101 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+
 
 <!-- Define Polymer Element -->
 <dom-module id="bp-sidebar">
     <!-- HTML, CSS Styles -->
     <template>
-        <style is="custom-style">
+        <style is="custom-style" include="iron-flex">
             paper-card {
-                width: 200px;
+                width: 300px;
+                margin-bottom: 16px;
+                font-family: Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
                 --paper-card-header: {
-                    background-color: red;
+                    background-color: #db4437;
                     color: white;
-                    height: 50px;
+                    height: 60px;
+                    font-family: Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
                 };
                 --paper-card-header-text: {
                     padding: 8px;
                     text-align: center;
+                    color: white;
                 }
+
+            }
+            .bp-nav-item {
+                color: #000000;
+                text-transform: uppercase;
+                justify-content: center;
+
+            }
+            .paper-item-link{
+                text-decoration: none;
+            }
+            .no-padding {
+                padding: 0;
+            }
+            .no-padding iron-icon {
+                margin-right: 8px;
+                color: #db4437;
             }
 
         </style>
         <div class="vertical layout">
             <paper-card heading="Groups">
-                <div class="card-content">
-                    <paper-item>ORINGS</paper-item>
-                    <paper-item>RETENES</paper-item>
-                    <paper-item>FRENOS</paper-item>
-                </div>
-            </paper-card>
-            <paper-card heading="Groups">
-                 <div role="listbox">
+                <div role="listbox">
                     <a class="paper-item-link" href="#inbox" tabindex="-1">
-                        <paper-item>Inbox</paper-item>
+                        <paper-item class="bp-nav-item">Retenes</paper-item>
                     </a>
                     <a class="paper-item-link" href="#starred" tabindex="-1">
-                        <paper-item>Starred</paper-item>
+                        <paper-item class="bp-nav-item">Frenos</paper-item>
                     </a>
                     <a class="paper-item-link" href="#sent" tabindex="-1">
-                        <paper-item>Sent mail</paper-item>
+                        <paper-item class="bp-nav-item">Orings</paper-item>
                     </a>
-                    </div>
-
+                </div>
             </paper-card>
+            <paper-card heading="Busqueda">
+                <div>
+                    <eip-autocomplete-input
+                            id="phone_number_select"
+                            label="Marca"
+                            list="[[_mapPhoneNumberList(phoneNumberList.*, currentLocation.groupId)]]"
+                            value="{{value}}"
+                            search-text="[[value]]"
+                            selected-item="[[value]]"
+                            always-float-label
+                            show-clear>
+                    </eip-autocomplete-input>
+                </div>
+            </paper-card>
+
+
+            <paper-card heading="Contactanos">
+                <div class="card-content">
+                    <paper-item class="no-padding">
+                        <iron-icon icon="communication:location-on" ></iron-icon>
+                        Gral Acha #670
+                    </paper-item>
+                    <paper-item class="no-padding">
+                        <iron-icon icon="communication:phone"></iron-icon>
+                        72252840
+                    </paper-item>
+                    <paper-item class="no-padding">
+                        <iron-icon icon="communication:email"></iron-icon>
+                        brake_parts@hotmail.com
+                    </paper-item>
+                </div>
+            </paper-card>
+
         </div>
     </template>
 

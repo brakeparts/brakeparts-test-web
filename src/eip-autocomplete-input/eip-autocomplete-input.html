@@ -1,0 +1,531 @@
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<dom-module id="eip-autocomplete-input">
+    <template>
+        <style is="custom-style">
+            :host {
+                display: block;
+                box-sizing: border-box;
+                position: relative;
+            }
+
+            /* Elements */
+            div[secondary] {
+                @apply(--paper-font-body1);
+                color: var(--paper-item-body-secondary-color, --secondary-text-color);
+                @apply(--paper-item-body-secondary);
+            }
+            iron-list {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            paper-item {
+                position: relative;
+            }
+            paper-item:hover, paper-item.focused {
+                background: var(--menu-hover-color, #f9f9f9);
+                font-weight: 500;
+                color: var(--default-text-color);
+                cursor: pointer;
+            }
+
+            /* Classes */
+            .input-wrapper {
+                @apply(--layout-horizontal);
+            }
+
+            .input-wrapper paper-input {
+                @apply(--layout-flex);
+            }
+
+            /* Specific Elements (by ID) */
+            #arrow_down, #clear {
+                color: var(--default-icon-color);
+                cursor: pointer;
+            }
+            #list_wrapper {
+                background-color: var(--paper-menu-background-color, #FFF);
+                overflow: hidden;
+                width: 100%;
+                position: absolute;
+                z-index: 1000;
+            }
+        </style>        
+        <div class="input-wrapper">
+            <paper-input
+                id="input"
+                label="{{label}}"
+                type="{{type}}"
+                value="{{searchText}}"
+                always-float-label$="{{alwaysFloatLabel}}"
+                disabled="{{disabled}}"
+                error-message="[[errorMessage]]"
+                on-keyup="_onKeyup">
+                <iron-icon suffix id="arrow_down" icon="arrow-drop-down" on-tap="_clear">
+                </iron-icon>
+                <iron-icon suffix id="clear" icon="clear" on-mousedown="_clear" hidden>
+                </iron-icon>
+            </paper-input>
+        </div>
+        <paper-material elevation="1" id="list_wrapper" hidden>
+            <iron-list id="iron_list" items="[[_filterItems(list.*, searchText)]]">
+                <template>
+                    <paper-item on-mousedown="_selectItem" value="[[item]]" tabindex$="[[tabIndex]]">
+                        <template is="dom-if" if="[[twoLine]]">
+                            <paper-item-body  two-line>
+                                <div>[[_computeText(item)]]</div>
+                                <div secondary>[[_computeValue(item)]]</div>
+                            </paper-item-body>
+                        </template>
+                        <template is="dom-if" if="[[!twoLine]]">
+                            <div>[[_computeText(item)]]</div>
+                        </template>
+                    </paper-item>
+                </template>
+            </iron-list>
+        </paper-material>
+    </template>
+
+    <script>
+        // Element Definition
+        EipAutocompleteInputElement =
+            Polymer({
+                is: "eip-autocomplete-input",
+
+                /*
+                 * -------------------------------------------
+                 *              Polymer Definitions
+                 * -------------------------------------------
+                 */
+                properties: {
+                    label: {
+                        type   : String,
+                        notify : true,
+                        value  : ""
+                    },
+                    searchText: {
+                        type   : String,
+                        notify : true,
+                        value  : ""
+                    },
+                    value: {
+                        type     : Object,
+                        notify   : true,
+                        value    : {}
+                    },
+                    textProperty: {
+                        type  : String,
+                        value : ""
+                    },
+                    valueProperty: {
+                        type  : String,
+                        value : ""
+                    },
+                    alwaysFloatLabel: {
+                        type   : Boolean,
+                        notify : true,
+                        value  : false
+                    },
+                    disabled: {
+                        type   : Boolean,
+                        notify : true,
+                        value  : false
+                    },
+                    showClear: {
+                        type   : Boolean,
+                        notify : true,
+                        value  : false
+                    },
+                    list: {
+                        type   : Array,
+                        notify : true,
+                        value  : null
+                    },
+                    selectedItem: {
+                        type  : Object,
+                        value : null
+                    },
+                    scrollIndex: {
+                        type  : Number,
+                        value : -1
+                    },
+                    twoLine: {
+                        type   : Boolean,
+                        notify : true,
+                        value  : false
+                    }
+                },
+
+                observers: [
+                    "_checkIsValidValue(list.*)"
+                ],
+
+                listeners: {
+                    "input.blur"             : "_onBlur",
+                    "input.mousedown"        : "_onMouseDown",
+                    "list_wrapper.mouseover" : "_onMouseOver"
+                },
+
+
+                /**
+                 * Invalidate this input
+                 */
+                invalidate: function() {
+                    this.$.input.invalid = true;
+                },
+
+                /**
+                 * Validate the selected item
+                 */
+                validate: function() {
+                    if (this.searchText) {
+                        this.$.input.invalid = false;
+                    } else {
+                        this.$.input.invalid = true;
+                    }
+                },
+
+                /*
+                 * -------------------------------------------
+                 *              Private Functions
+                 * -------------------------------------------
+                 */
+
+                _checkIsValidValue: function(_list) {
+                    var list = _list.base;
+
+                    if ( list && this.value ) {
+                        var found = list.find(function(item) {
+                            var value = this.value[this.valueProperty] || this.value;
+                            if ( this.valueProperty ) {
+                                return item[this.valueProperty] === value;
+                            } else {
+                                return item === value;
+                            }
+                        }, this);
+
+                        if ( !found ) {
+                            this.set("searchText", "");
+                            this.set("value", "");
+                            this.set("selectedItem", "");
+                        }
+                    }
+                },
+
+
+                /**
+                 * Clear the search input and show the list
+                 * @private
+                 */
+                _clear: function() {
+                    this.async(function() {
+                        // Only execute this function if there is search text
+                        if ( this.searchText !== "" ){
+                            this.set("searchText", "");
+                        }
+                        this._showList();
+                    }, 5);
+                },
+
+                /**
+                 * Returns the `text-property` attribute of the item
+                 * @returns {String}
+                 * @private
+                 */
+                _computeText: function(item) {
+                    var _text = "";
+                    if (this.textProperty) {
+                        _text = item[this.textProperty];
+                    } else {
+                        _text = item.toString();
+                    }
+                    return _text;
+                },
+
+                /**
+                 * Returns the `value-property` attribute of the item
+                 * @returns {String}
+                 * @private
+                 */
+                _computeValue: function(item) {
+                    return item[this.valueProperty];
+                },
+
+                /**
+                 * Filter an array of objects by their values
+                 * using string input via value.includes(String)
+                 * @param {Array} items
+                 * @param {String} searchText
+                 * @returns {Array}
+                 * @private
+                 */
+                _filterItems: function(items, searchText) {
+                    var textProperty  = this.textProperty,
+                        valueProperty = this.valueProperty,
+                        twoLine       = this.twoLine;
+
+                    if (items.base && items.base.length > 0) {
+                        if (typeof items.base[0] == "number") {
+                            return items.base.filter(function(item) {
+                                var _text   = item ? item.toString() : "";
+
+                                searchText = searchText ? searchText.toString() : "";
+                                var regex = new RegExp("^" + searchText, "gi");
+
+                                return regex.test(_text);
+                            });
+                        } else if (typeof items.base[0] == "string") {
+                            return items.base.filter(function(item) {
+                                var _return = false,
+                                    _text   = item ? item.toLowerCase() : "";
+
+                                searchText = searchText ? searchText.toLowerCase() : "";
+
+                                if ( _text.includes(searchText) ) {
+                                    _return = true;
+                                }
+
+                                return _return;
+                            });
+                        } else if (typeof items.base[0] == "object") {
+                            var returnData = [];
+                            if (searchText) searchText = searchText.toLowerCase();
+                            if (items) {
+                                items.base.forEach(function(item) {
+                                    for (var prop in item) {
+                                        if (item.hasOwnProperty(prop)) {
+                                            var propValue = item[prop].toString().toLowerCase();
+                                            if (propValue.includes(searchText)) {
+                                                returnData.push(item);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                            return returnData;
+                        } else {
+                            // Note: Not sure how to handle yet? What else is there? An array of arrays? That shit will break, because that's technically a typeof == object.
+                        }
+                    }
+                },
+
+                /**
+                 * Get all `paper-item` elements
+                 * @returns {*|NodeList}
+                 * @private
+                 */
+                _getItems: function() {
+                    return Polymer.dom(this.root).querySelectorAll('paper-item');
+                },
+
+                /**
+                 * Hide the iron-list, wrapper, and arrow icon
+                 * @private
+                 */
+                _hideList: function() {
+                    this.$.list_wrapper.hidden = true;
+                    this.$.clear.hidden = true;
+                    this.$.arrow_down.hidden = false;
+                },
+
+                /**
+                 * Handle `Enter` key presses by setting the current focused item
+                 * to the selected item
+                 * @param {Event}
+                 * @private
+                 */
+                _keyenter: function(e) {
+                    var $selected = this.$$("paper-item.focused");
+
+                    try {
+                        e.model = {"item": $selected.value};
+                        this._selectItem(e);
+                    } catch (err) {
+                        // No selection made, just return
+                        return;
+                    }
+                },
+
+                /**
+                 * Reset the `autocomplete-input` value to the last value
+                 * if no new item has been selected
+                 * @private
+                 */
+                _onBlur: function() {
+                    if (this.textProperty) {
+                        if ( this.searchText === "" || this.searchText !== this.selectedItem[this.textProperty] ) {
+                            this.set("searchText", this.selectedItem ? this.selectedItem[this.textProperty] : "");
+                        }
+                    } else {
+                        if ( this.searchText === "" || this.searchText !== this.selectedItem.toString() ) {
+                            this.set("searchText", typeof this.selectedItem !== "object" ? this.selectedItem.toString() : "");
+                        }
+                    }
+
+                    this._hideList();
+                },
+
+                /**
+                 * Special handling for `ArrowDown`, `ArrowUp`, and `Enter` keys
+                 * @param {Event} keyup event
+                 * @private
+                 */
+                _onKeyup: function(e) {
+                    var keyCode = e.keyCode;
+
+                    if ( this.$.list_wrapper.hidden ) {
+                        this._showList();
+                    }
+
+                    // 40: "ArrowDown", 38: "ArrowUp", 13: "Enter"
+                    switch ( keyCode ) {
+                        case 40:
+                            this._navigateTo(true);
+                            break;
+                        case 38:
+                            this._navigateTo(false);
+                            break;
+                        case 13:
+                            this._keyenter(e);
+                            break;
+                        default:
+                            this.$.clear.hidden = !this.searchText;
+                            break;
+                    }
+                },
+
+                /**
+                 * Open the list when a user clicks the input
+                 * @private
+                 */
+                _onMouseDown: function(e) {
+                    e.stopPropagation();
+                    this._showList();
+                },
+
+                /**
+                 * Removes the `focus` class from moused-over items
+                 * to eliminate focus collision with key press scrolling
+                 * (arrow based selection)
+                 * @private
+                 */
+                _onMouseOver: function(e) {
+                    this._removeFocusedClass();
+                },
+
+                /**
+                 * Adjust the scroll index via keypress
+                 * @param {Boolean} scrollDown
+                 * @private
+                 */
+                _navigateTo: function(scrollDown) {
+                    if ( this.scrollIndex === -1 ) {
+                        this.scrollIndex++;
+                        this._scrollTo(this.scrollIndex);
+                        return;
+                    }
+
+                    if ( scrollDown && this.scrollIndex < this.list.length -1 ) {
+                        this.scrollIndex++;
+                    }
+
+                    if ( !scrollDown && this.scrollIndex > 0 ) {
+                        this.scrollIndex--;
+                    }
+
+                    this._scrollTo(this.scrollIndex);
+                },
+
+                /**
+                 * Remove class `focused` from a list item
+                 * @private
+                 */
+                _removeFocusedClass: function() {
+                    var $items = this._getItems();
+
+                    $items.forEach(function(item) {
+                        item.toggleClass("focused", false);
+                    });
+                },
+
+                /**
+                 * Scroll the `iron-list` and set the focused item
+                 * taking hidden/filtered items into consideration
+                 * @param {Number} index
+                 * @private
+                 */
+                _scrollTo: function(index) {
+                    var $list = this.$$("iron-list"),
+                        $item = this._getItems()[index];
+
+                    if ( !$item.hidden ) {
+                        $list.scrollToIndex(index);
+                        this._removeFocusedClass();
+                        $item.toggleClass("focused", true);
+                    } else {
+                        this.scrollIndex--;
+                    }
+                },
+
+                /**
+                 * Make a selection from the list and properly
+                 * update search criteria and scrolling information
+                 * @param {Event}
+                 * @private
+                 */
+                _selectItem: function(e) {
+                    var item  = e.model.item;
+
+                    this.set("selectedItem", item);
+                    if (item[this.valueProperty]) {
+                        this.set("value", item[this.valueProperty]);
+                    } else {
+                        this.set("value", item);
+                    }
+                    if (item[this.textProperty]) {
+                        this.set("searchText", item[this.textProperty]);
+                    } else {
+                        this.set("searchText", item.toString());
+                    }
+                    this.set("scrollIndex", -1);
+
+                    this._removeFocusedClass();
+                    this._hideList();
+                    e.currentTarget.toggleClass("active", true);
+
+                    this.fire("iron-select", {
+                        "selectedItem" : this.selectedItem
+                    });
+                },
+
+                /**
+                 * Show the iron-list, list wrapper, and clear icon.
+                 * Hide the arrow down icon. Give the input element focus
+                 * @param {Event}
+                 */
+                _showList: function(e) {
+                    this._removeFocusedClass();
+                    this.set("scrollIndex", -1);
+
+                    this.$.list_wrapper.hidden = false;                    
+                    this.$.arrow_down.hidden = true;
+                    this.$.input.inputElement.focus();
+                    this.$.clear.hidden = !this.searchText;
+                    this.async(function() {
+                        this.$$("iron-list").notifyResize();
+                    }, 100);
+                }
+                // TODO: Handle initial input better, currently `search-text` and `selected-item` must both always be set
+                // Note: Perhaps consider an observer on `selected-item` to update `search-text`
+
+            });
+    </script>
+</dom-module>
