@@ -7,15 +7,19 @@
 <link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="../bp-home/bp-home.html">
 <link rel="import" href="../bp-sidebar/bp-sidebar.html">
+<link rel="import" href="bp-search.html">
+<link rel="import" href="bp-search-categories.html">
 
 <dom-module id="bp-navigation">
     <!-- HTML, CSS Styles -->
     <template>
-        <style is="custom-style">
+        <style is="custom-style" include="iron-flex">
             app-header {
                 background-color: #db4437;
                 color: #fff;
@@ -59,12 +63,26 @@
                 background: rgba(255,0,0,0.4);
             }
         </style>
+        <iron-media-query query="(max-width: 644px)" query-matches="{{_isSmallScreenSize}}"></iron-media-query>
 
         <app-header-layout>
             <app-header fixed effects="waterfall" slot="header">
                 <app-toolbar>
                     <paper-icon-button id="toggle" icon="menu" on-tap="_toggleSidebar"></paper-icon-button>
-                    <div main-title>BrakeParts</div>
+                    <div main-title><img class="logo" src="../../images/header.png" alt=""></div>
+
+                    <div id="bp_search_container" class$="[[_computeSearchBarContainerClass(_isSmallScreenSize)]]">
+                        <bp-search
+                                id="eip_search"
+                                container="bp_search_container"
+                                search-categories-element="[[searchCategoriesElement]]"
+                                search-text="{{searchText}}"
+                                active-category="{{activeCategory}}"
+                                search-categories="{{searchCategories}}"
+                                disabled="{{searchDisabled}}"
+                                top-item>
+                        </bp-search>
+                    </div>
                 </app-toolbar>
             </app-header>
 
@@ -78,6 +96,13 @@
                 <bp-home></bp-home>
             </app-drawer-layout>
         </app-header-layout>
+
+        <bp-search-categories
+                id="bp_search_categories"
+                active-category="{{activeCategory}}"
+                search-text="{{searchText}}"
+                search-categories="{{searchCategories}}">
+        </bp-search-categories>
     </template>
 
     <!-- Javascript -->
@@ -86,9 +111,35 @@
             is: 'bp-navigation',
 
             properties: {
+                _isSmallScreenSize: {
+                    type : Boolean,
+                    value: false
+                },
+                searchText: {
+                    type: String,
+                    notify: true,
+                    value: ""
+                },
+                searchCategories: {
+                    type: Array,
+                    notify: true,
+                    value: function(){
+                        return [];
+                    }
+                },
+                searchCategoriesElement: {
+                    type: Object,
+                    value: function(){
+                        return this.$.eip_search_categories;
+                    }
+                },
+                activeCategory: {
+                    type: Object,
+                    notify: true
+                }
 
             },
-
+            
             _toggleSidebar: function() {
                 const drawerLayout = this.$.drawerLayout;
                 if (drawerLayout.forceNarrow || !drawerLayout.narrow) {
@@ -96,6 +147,19 @@
                 } else {
                     drawerLayout.drawer.toggle();
                 }
+            },
+            
+            _computeSearchBarContainerClass: function( _isSmallScreenSize ) {
+                var className = "";
+
+                if ( _isSmallScreenSize === true ){
+                    className = "middle justify-center flex";
+                }
+                else{
+                    className = "justify-center flex";
+                }
+
+                return ( className );
             }
 
         });
