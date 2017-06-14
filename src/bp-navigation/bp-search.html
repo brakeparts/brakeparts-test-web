@@ -1,0 +1,383 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/device-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/editor-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/notification-icons.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+
+<dom-module id="bp-search">
+    <style>
+        /* CSS is defined here */
+        :host {
+            --paper-input-container-underline: {
+                display: none;
+            };
+            --paper-input-container-underline-focus: {
+                display: none;
+            };
+        }
+
+        #ico_search {
+            color:#ffffff;
+        }
+
+        #search_input {
+
+        }
+
+        #search_label {
+            color: #ffffff;
+            opacity: 0.3;
+        }
+
+        paper-input-container {
+            padding: 4px 4px 4px 8px;
+            border-radius: 8px;
+            background-color: rgba(255,255,255,0.2);
+        }
+    </style>
+    <template>
+        <!-- Visual element content goes here -->
+        <div id="search_container">
+            <paper-input-container no-label-float>
+                <iron-icon
+                    id="ico_search"
+                    hidden$="[[_computeSearchIconVisibility(activeCategory)]]"
+                    icon="search"
+                    prefix>
+                </iron-icon>
+                <iron-icon
+                    id="active_category_1"
+                    hidden$="[[_computeCategoryIconVisibility(activeCategory)]]"
+                    icon="[[_computeCategoryIcon(activeCategory.categoryIcon)]]"
+                    style$="color:[[_computeCategoryIconColor(activeCategory.categoryColor)]];"
+                    prefix>
+                </iron-icon>
+                <paper-tooltip for="active_category_1">[[activeCategory.categoryName]]</paper-tooltip>
+                <label id="search_label">Search</label>
+                <input id="search_input" is="iron-input" bind-value="{{searchText}}">
+                <paper-icon-button icon="arrow-drop-down" on-tap="_openAdvancedOptions" style$="visibility:[[_computeAdvancedArrowVisibility(_showAdvancedArrow)]]" suffix></paper-icon-button>
+            </paper-input-container>
+        </div>
+    </template>
+
+    <script>
+        // Element Definition
+        BpSearch =
+                Polymer({
+                    is: "bp-search",
+
+                    /*
+                     * -------------------------------------------
+                     *              Polymer Definitions
+                     * -------------------------------------------
+                     */
+                    behaviors: [
+                        Polymer.IronResizableBehavior
+                    ],
+
+                    properties: {
+                        searchText: {
+                            type: String,
+                            notify: true,
+                            observer: "_onSearchTextChanged"
+                        },
+                        searchCategories: {
+                            type: Array,
+                            notify: true,
+                            value: function(){
+                                return [];
+                            }
+                        },
+                        searchCategoriesElement:{
+                            type: Object
+                        },
+                        activeCategory: {
+                            type: Object,
+                            value: {}
+                        },
+                        _showClear: {
+                            type: Boolean,
+                            value: false
+                        },
+                        _showAdvancedArrow: {
+                            type: Boolean,
+                            value: true
+                        },
+                        _showAdvancedOptions: {
+                            type: Boolean,
+                            value: false,
+                            observer: "_updatePosition"
+                        },
+                        disabled: {
+                            type: Boolean,
+                            value: false,
+                            notify: true,
+                            observer: "_onDisabledChanged"
+                        },
+                        container: {
+                            type: String,
+                            notify: true,
+                            value: null
+                        }
+                    },
+
+                    listeners: {
+                        "iron-resize": "_updatePosition"
+                    },
+
+                    /*
+                     * -------------------------------------------
+                     *              Element Functions
+                     * -------------------------------------------
+                     */
+
+                    /**
+                     * Update the search categories.
+                     * @param _searchCategories The search categories to set.
+                     */
+                    updateSearchCategories: function( _searchCategories ){
+                        if ( _searchCategories ){
+                            if ( _searchCategories.length > 0 ){
+                                for ( var x = 0; x < _searchCategories.length; x++ ){
+                                    var searchCategory  = _searchCategories[x];
+
+                                    if ( searchCategory && searchCategory.categoryActive ){
+                                        this.set( "activeCategory", searchCategory );
+                                        break;
+                                    }
+                                }
+                                this.set( "searchCategories", _searchCategories );
+                                this.set( "_showAdvancedArrow", true );
+                                this.set( "disabled", false );
+                                this._updatePosition();
+                            }
+                            else{
+                                this.set( "_showAdvancedArrow", false );
+                                this.set( "activeCategory", {} );
+                                this.fire( "close-search-categories", {} );
+                            }
+                        }
+                        else{
+                            this.fire( "close-search-categories", {} );
+                        }
+                    },
+
+                    /**
+                     * Update the search bar with properties
+                     * @param _searchBarProperties
+                     */
+                    updateSearchBarProperties: function( _searchBarProperties ){
+                        this.updateSearchCategories( _searchBarProperties.searchCategories );
+                        this.set( "disabled", _searchBarProperties.disabled );
+                    },
+
+                    /**
+                     * Clear the search box and give the input focus
+                     */
+                    clear: function() {
+                        this.set( "searchText", "" );
+                        this.set( "activeCategory", null );
+
+                        if (this.get("_showAdvancedOptions") == false) {
+                            this.$.search_input.focus();
+                        } else {
+                            this.$.search_input_inner.focus();
+                        }
+                    },
+
+                    /**
+                     * Show the advanced search options card
+                     */
+                    _openAdvancedOptions: function() {
+                        this.fire( "open-search-categories", {} );
+                    },
+
+                    /**
+                     * Handle the disabled value changed.
+                     * @param _currentDisabled
+                     * @param _previousDisabled
+                     */
+                    _onDisabledChanged: function( _currentDisabled, _previousDisabled ){
+                        this.set( "hidden", _currentDisabled );
+                        //Hide/Show parent container if current element is enabled or disabled.
+                        if (this.container && document.getElementById(this.container)) {
+                            var containerStyle = document.getElementById(this.container).style;
+                            if (_currentDisabled) {
+                                containerStyle.display = "none";
+                            } else {
+                                containerStyle.display = "";
+                            }
+                        }
+                    },
+
+                    /**
+                     * Updates the search bar clear / advanced buttons
+                     * @param {String} _searchText
+                     * @private
+                     */
+                    _onSearchTextChanged: function( _searchText ) {
+                        if (_searchText == "") {
+                            this.set( "_showClear", false );
+                            this.set( "_showAdvancedArrow", true );
+                        } else {
+                            //this.set("_showAdvancedArrow", false);
+                            this.set( "_showClear", true );
+                        }
+                    },
+
+                    /**
+                     * Update the position of the advanced options card relative to the search bar
+                     * @private
+                     */
+                    _updatePosition: function() {
+                        if (!this._target)
+                            return;
+                        if (!this.offsetParent)
+                            return;
+                        var targetRect = this._target.getBoundingClientRect();
+                        if ( targetRect ){
+                            if ( this.searchCategoriesElement ){
+                                var dialog = this.searchCategoriesElement.dialog;
+                                dialog.positionTarget = this._target;
+                                dialog.style.width = this._target.offsetWidth + "px";
+                                dialog.horizontalAlign = targetRect.left;
+                                dialog.verticalAlign = targetRect.top;
+
+                                // This opens and positions the element
+                                dialog.position();
+                            }
+                        }
+                        else{
+                            console.error( "_updatePosition() - No target rectangle found." );
+                        }
+                    },
+
+                    /**
+                     * Send an update to reposition the element.
+                     */
+                    notifyUpdatePosition: function(){
+                        this._updatePosition();
+                    },
+
+                    /**
+                     * Position the advanced options card under the search bar
+                     * @private
+                     */
+                    _positionAdvancedCard: function() {
+                        if (!this.isAttached) {
+                            return;
+                        }
+                        this._target = this.target;
+                        this.async(this.notifyResize, 1);
+                    },
+
+                    /**
+                     * Compute the advanced array visibilty css value.
+                     * @param _showAdvancedArrow
+                     */
+                    _computeAdvancedArrowVisibility: function( _showAdvancedArrow ){
+                        var displayValue    = "visible";
+
+                        if ( _showAdvancedArrow == false ){
+                            displayValue    = "hidden";
+                        }
+
+                        return ( displayValue );
+                    },
+
+                    /**
+                     * Compute the category icon.
+                     * @param _category
+                     */
+                    _computeCategoryIconVisibility: function( _category ){
+                        var hidden  = true;
+                        if ( _category && _category.categoryName ){
+                            hidden  = false;
+                        }
+
+                        return ( hidden );
+                    },
+
+                    /**
+                     * Compute the sear
+                     * @param _category
+                     */
+                    _computeSearchIconVisibility: function( _category ){
+                        var hidden  = false;
+                        if ( _category && _category.categoryName ){
+                            hidden  = true;
+                        }
+
+                        return ( hidden );
+                    },
+
+                    /**
+                     * Compute the category icon.
+                     * @param _categoryIcon
+                     */
+                    _computeCategoryIcon: function( _categoryIcon ){
+                        var computedIcon    = this.defaultCategoryIcon;
+
+                        if ( _categoryIcon ){
+                            computedIcon    = _categoryIcon;
+                        }
+
+                        return ( computedIcon );
+                    },
+
+                    /**
+                     * Compute the category icon color.
+                     * @param _categoryColor
+                     */
+                    _computeCategoryIconColor: function( _categoryColor ){
+                        var computedIconColor    = this.defaultCategoryColor;
+                        if ( _categoryColor ){
+                            computedIconColor    = _categoryColor;
+                        }
+
+                        return ( computedIconColor );
+                    },
+
+                    /**
+                     * Get the positioning target
+                     */
+                    get target () {
+                        var parentNode = Polymer.dom(this).parentNode;
+                        // If the parentNode is a document fragment, then we need to use the host.
+                        var ownerRoot = Polymer.dom(this).getOwnerRoot();
+                        var target;
+                        if (this.isAttached) {
+                            target = document.querySelector('#search_container');
+                        } else {
+                            target = parentNode.nodeType == Node.DOCUMENT_FRAGMENT_NODE ?
+                                    ownerRoot.host : parentNode;
+                        }
+                        return target;
+                    },
+
+                    /*
+                     * -------------------------------------------
+                     *              Polymer Functions
+                     * -------------------------------------------
+                     */
+
+                    /**
+                     * Called after the component has been attached to the light DOM
+                     */
+                    attached: function() {
+                        this._positionAdvancedCard();
+                    }
+                });
+    </script>
+</dom-module>

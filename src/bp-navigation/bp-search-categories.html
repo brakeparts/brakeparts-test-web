@@ -1,0 +1,340 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/device-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/editor-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/notification-icons.html">
+
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<dom-module id="bp-search-categories">
+    <style>
+        /* CSS is defined here */
+        :host {
+            --paper-input-container-underline: {
+                display: none;
+            };
+            --paper-input-container-underline-focus: {
+                display: none;
+            };
+            z-index: 9999 !important;
+        }
+
+        #advanced_search_options {
+            background-color: white;
+            position: fixed;
+            overflow: auto;
+            display: block;
+            margin: 0px;
+            width: 100%;
+        }
+
+        #advanced_search_options [hidden] {
+            display: none !important;
+        }
+
+        #search_input_inner {
+            color: #000000;
+        }
+
+        #search_label_inner {
+            color: #000000;
+            opacity: 0.3;
+        }
+
+        paper-dialog > *:first-child {
+            margin-top: 0 !important;
+        }
+
+        paper-input-container {
+            padding: 4px 4px 4px 8px;
+            border-radius: 8px;
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .categorySelection{
+            cursor: pointer;
+            padding: 8px;
+        }
+    </style>
+    <template>
+        <paper-dialog id="advanced_search_options" dynamic-align>
+            <paper-input-container no-label-float>
+                <iron-icon
+                        hidden$="[[_computeCategoryIconVisibility(activeCategory)]]"
+                        icon="[[_computeCategoryIcon(activeCategory.categoryIcon)]]"
+                        style$="color:[[_computeCategoryIconColor(activeCategory.categoryColor)]];"
+                        prefix>
+                </iron-icon>
+                <iron-icon
+                        icon="search"
+                        hidden$="[[_computeSearchIconVisibility(activeCategory)]]"
+                        prefix>
+                </iron-icon>
+                <label id="search_label_inner">Search</label>
+                <input id="search_input_inner" is="iron-input" bind-value="{{searchText}}" on-keydown="_handleInputKeyDown">
+                <paper-icon-button icon="clear" on-tap="clear" suffix></paper-icon-button>
+            </paper-input-container>
+            <template is="dom-repeat" items="{{searchCategories}}">
+                <paper-icon-item class="categorySelection" data-category-index$="[[index]]" on-tap="_handleCategorySelection">
+                    <iron-icon
+                            icon="[[_computeCategoryIcon(item.categoryIcon)]]"
+                            style$="color:[[_computeCategoryIconColor(item.categoryColor)]];"
+                            item-icon>
+                    </iron-icon>
+                    [[item.categoryName]]
+                </paper-icon-item>
+            </template>
+        </paper-dialog>
+
+    </template>
+
+    <script>
+        // Element Definition
+        EipSearchCategories =
+                Polymer({
+                    is: "bp-search-categories",
+
+                    /*
+                     * -------------------------------------------
+                     *              Polymer Definitions
+                     * -------------------------------------------
+                     */
+                    properties: {
+                        activeCategory: {
+                            type: Object,
+                            value: {},
+                            notify: true
+                        },
+                        defaultCategoryColor: {
+                            type: String,
+                            value: "black"
+                        },
+                        defaultCategoryIcon: {
+                            type: String,
+                            value: "image:lens"
+                        },
+                        searchText: {
+                            type: String,
+                            notify: true
+                        },
+                        searchCategories: {
+                            type: Array,
+                            notify: true,
+                            value: function(){
+                                return [];
+                            }
+                        },
+                        // Give reference to dialog to easily position it properly.  This allows for consistent behavior in all browsers including IE11:)
+                        dialog: {
+                            type: Object,
+                            value: function(){
+                                return this.$.advanced_search_options;
+                            }
+                        }
+                    },
+
+                    listeners: {
+                        "iron-overlay-closed" : "_handleDialogOverlayClosed"
+                    },
+
+                    /*
+                     * -------------------------------------------
+                     *              Element Functions
+                     * -------------------------------------------
+                     */
+
+                    /**
+                     * Handle the dialog overlay closed event.
+                     * @param _event
+                     */
+                    _handleDialogOverlayClosed: function( _event ){
+                        this.fire( "close-search-categories" );
+                    },
+
+                    /**
+                     * Handle the key down event figured in the search bar.
+                     * @param _event
+                     */
+                    _handleInputKeyDown: function( _event ){
+                        var keyCode = _event.which || _event.keyCode;
+                        // 13: "Enter"
+                        switch ( keyCode ){
+                            case 13:
+                                this.close();
+                                break;
+                            default:
+                                break;
+                        }
+                    },
+
+                    /**
+                     * Clear the search box and give the input focus
+                     */
+                    clear: function() {
+
+                        // If there is search text
+                        if ( this.searchText && this.searchText.length > 0 ){
+                            this.set( "searchText", "" );
+                            this.set( "activeCategory", null );
+                            this.$.search_input_inner.focus();
+                        }
+                        else{
+                            // If there is an active category, clear it and focus the input container
+                            if ( this.activeCategory ){
+                                this.set( "activeCategory", null );
+                                this.$.search_input_inner.focus();
+                            }
+                            // Otherwise, close the category window.
+                            else{
+                                this.close();
+                            }
+                        }
+                    },
+
+                    /**
+                     * Open this window.
+                     */
+                    open: function(){
+                        if ( this.$.advanced_search_options ){
+                            this.$.advanced_search_options.open();
+                            this.async(function() {
+                                this.$.search_input_inner.focus();
+                            }, 500);
+
+                            this.fire( "search-categories-opened" );
+                        }
+                    },
+
+                    /**
+                     * Close this window.
+                     */
+                    close: function(){
+                        if ( this.$.advanced_search_options ){
+                            this.$.advanced_search_options.close();
+                            this.fire( "search-categories-closed" );
+                        }
+                    },
+
+                    /**
+                     * Handle a category
+                     * @param _event
+                     */
+                    _handleCategorySelection: function( _event ){
+                        var model   = _event.model;
+                        var categoryIndex   = -1;
+
+                        if ( _event.target ){
+                            categoryIndex = _event.target.getAttribute( "data-category-index" );
+                        }
+
+                        if ( model ){
+                            var category    = model.item;
+                            this.set( "activeCategory", {} );
+                            this.set( "activeCategory", category );
+
+                            // Reset all categories to not active
+                            var categoriesCount = 0;
+
+                            if ( this.searchCategories ){
+                                categoriesCount = this.searchCategories.length;
+                            }
+
+                            if ( categoriesCount > 0 ){
+                                for ( var x = 0; x < categoriesCount ; x++ ){
+                                    this.set( "searchCategories." + x + ".categoryActive", false );
+                                }
+                            }
+
+                            // Set the active category
+                            this.set( "searchCategories." + categoryIndex + ".categoryActive", true );
+                        }
+
+                        this.close();
+                    },
+
+                    /**
+                     * Compute the category icon.
+                     * @param _category
+                     */
+                    _computeCategoryIconVisibility: function( _category ){
+                        var hidden  = true;
+                        if ( _category && _category.categoryName ){
+                            hidden  = false;
+                        }
+
+                        return ( hidden );
+                    },
+
+                    /**
+                     * Compute the sear
+                     * @param _category
+                     */
+                    _computeSearchIconVisibility: function( _category ){
+                        var hidden  = false;
+                        if ( _category && _category.categoryName ){
+                            hidden  = true;
+                        }
+
+                        return ( hidden );
+                    },
+
+                    /**
+                     * Compute the category icon.
+                     * @param _categoryIcon
+                     */
+                    _computeCategoryIcon: function( _categoryIcon ){
+                        var computedIcon    = this.defaultCategoryIcon;
+
+                        if ( _categoryIcon ){
+                            computedIcon    = _categoryIcon;
+                        }
+
+                        return ( computedIcon );
+                    },
+
+                    /**
+                     * Compute the category icon color.
+                     * @param _categoryColor
+                     */
+                    _computeCategoryIconColor: function( _categoryColor ){
+                        var computedIconColor    = this.defaultCategoryColor;
+                        if ( _categoryColor ){
+                            computedIconColor    = _categoryColor;
+                        }
+
+                        return ( computedIconColor );
+                    },
+
+                    /*
+                     * -------------------------------------------
+                     *              Polymer Functions
+                     * -------------------------------------------
+                     */
+
+                    /**
+                     * Called after the element's template has been stamped
+                     * and all elements inside the element's local DOM have been configured
+                     * (with values bound from parents, deserialized attributes, or else default values)
+                     * and had their ready method called.
+                     */
+                    ready: function() {
+                    },
+
+                    /**
+                     * Called after the component has been attached to the light DOM
+                     */
+                    attached: function() {
+                    }
+                });
+    </script>
+</dom-module>
