@@ -8,9 +8,12 @@
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="../bp-home/bp-home.html">
 <link rel="import" href="../bp-sidebar/bp-sidebar.html">
@@ -20,7 +23,7 @@
 <dom-module id="bp-navigation">
     <!-- HTML, CSS Styles -->
     <template>
-        <style is="custom-style" include="iron-flex">
+        <style is="custom-style" include="iron-flex iron-flex-factors">
             app-header {
                 background-color: #db4437;
                 color: #fff;
@@ -41,6 +44,11 @@
                 height: calc(100% - 100px);
                 overflow: auto;
                 margin-left: 16px;
+            }
+            .user-lbl {
+                margin: 2px 4px 0 4px;
+                font-size: 14px;
+                text-transform: capitalize;
             }
             ::-webkit-scrollbar {
                 width: 5px;
@@ -87,6 +95,13 @@
                                 top-item>
                         </bp-search>
                     </div>
+
+                    <paper-item class="horizontal layout">
+                        <iron-icon icon="social:person"></iron-icon>
+                        <div class="user-lbl">[[loggedInUser.profile.name]]</div>
+                        <paper-icon-button icon="power-settings-new" id="logout_btn" on-tap="_logout"></paper-icon-button>
+                        <paper-tooltip for="logout_btn" position="bottom">Log out</paper-tooltip>
+                    </paper-item>
                 </app-toolbar>
             </app-header>
 
@@ -97,7 +112,7 @@
                     </div>
                 </app-drawer>
 
-                <bp-home class="flex"></bp-home>
+                <bp-home></bp-home>
             </app-drawer-layout>
         </app-header-layout>
 
@@ -118,6 +133,11 @@
                 _isSmallScreenSize: {
                     type : Boolean,
                     value: false
+                },
+                loggedInUser: {
+                    type   : Object,
+                    notify : true,
+                    value  : null
                 },
                 searchText: {
                     type: String,
@@ -154,18 +174,22 @@
             },
             
             _computeSearchBarContainerClass: function( _isSmallScreenSize ) {
-                var className = "";
+                let className = "";
 
                 if ( _isSmallScreenSize === true ){
-                    className = "middle justify-center flex";
+                    className = "middle justify-center flex-2";
                 }
                 else{
-                    className = "justify-center flex";
+                    className = "justify-center flex-2";
                 }
 
                 return ( className );
-            }
+            },
 
+            _logout: function() {
+                this.set('loggedInUser', null);
+                localStorage.removeItem('bpSessionData');
+            }
         });
     </script>
 </dom-module>

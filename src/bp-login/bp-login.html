@@ -1,0 +1,106 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="../lockjs.html">
+
+<dom-module id="bp-login">
+    <!-- HTML, CSS Styles -->
+    <template>
+        <style include="iron-flex">
+            :host {
+                height: 100vh;
+                background-color: #2f3239;
+            }
+            h3 {
+                margin: 40px 0 0;
+                font-size: 24px;
+                text-align: center;
+            }
+            paper-material {
+                width: 430px;
+                background-color: #fff;
+                border-radius: 8px;
+            }
+            .form {
+                padding: 40px;
+            }
+            #login_btn {
+                width: 100%;
+                margin-top: 16px;
+                background-color: #d82521;
+                color: #fff;
+            }
+            #login_btn:hover {
+                background-color: #a50303;
+            }
+        </style>
+
+        <div class="horizontal layout center-justified">
+            <paper-material elevation="2">
+                <div class="horizontal layout center-justified">
+                    <img class="logo" src="../../images/logo.png" alt="Brake Parts">
+                </div>
+                <!--<h3 class="header">Log in to your account</h3>-->
+                <div class="form">
+                    <paper-button raised id="login_btn" on-tap="_login">Log In</paper-button>
+                </div>
+            </paper-material>
+        </div>
+    </template>
+
+    <!-- Javascript -->
+    <script>
+        Polymer({
+            is: 'bp-login',
+
+            properties: {
+                clientId: {
+                    type  : String,
+                    value : 't7fKeNcPyBcmrdhBWQ2bYMl9SmdM1zYe'
+                },
+                domain: {
+                    type  : String,
+                    value : 'brakepartscb.auth0.com'
+                },
+                auth0Lock: {
+                    type  : Object,
+                    value : null
+                }
+            },
+
+            _login: function() {
+                this.auth0Lock.show();
+            },
+
+            ready: function() {
+                let lockOptions = {
+                    auth: {
+                        redirect: false
+                    }
+                };
+
+                this.auth0Lock = new Auth0Lock(this.clientId, this.domain, lockOptions);
+
+                this.auth0Lock.on("authenticated", (authResult) => {
+                    this.auth0Lock.hide();
+                    this.auth0Lock.getUserInfo(authResult.accessToken, (error, profile) => {
+                        if ( error ) {
+                            console.error('Something went wrong: ', error);
+                            return;
+                        }
+                        this.fire('bp-authentication-success', {
+                            loggedInUser : {
+                                token: authResult.accessToken,
+                                profile: profile
+                            }
+                        });
+                    });
+                });
+            }
+        });
+    </script>
+</dom-module>

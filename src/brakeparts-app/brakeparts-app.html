@@ -1,24 +1,22 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../login/main-login.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../bp-login/bp-login.html">
 <link rel="import" href="../bp-navigation/bp-navigation.html">
 
 <dom-module id="brakeparts-app">
     <!-- HTML, CSS Styles -->
     <template>
-        <style>
-
-        </style>
-
+        <style include="iron-flex"></style>
         <!-- Login Page -->
         <template is="dom-if" if="[[!isLoggedIn]]">
-            <main-login></main-login>
+            <bp-login class="vertical layout center-justified"></bp-login>
         </template>
 
         <!-- Navigation element -->
         <template is="dom-if" if="[[isLoggedIn]]">
-            <bp-navigation
-                    id="bp_navigation">
+            <bp-navigation id="bp_navigation" logged-in-user="{{loggedInUser}}">
             </bp-navigation>
         </template>
     </template>
@@ -33,6 +31,11 @@
                     type   : Boolean,
                     notify : true,
                     value  : false
+                },
+                loggedInUser: {
+                    type   : Object,
+                    notify : true,
+                    value  : null
                 }
             },
 
@@ -40,11 +43,35 @@
                 'bp-authentication-success': '_handleAuthenticationSuccess'
             },
 
-            _handleAuthenticationSuccess: function(e) {
-                this.set("isLoggedIn", true);
-                console.log(e.detail.user);
-            }
+            observers: [
+                '_checkLoggedInUser(loggedInUser)'
+            ],
 
+            _checkLoggedInUser: function( _loggedInUser ) {
+                this.set("isLoggedIn", !!_loggedInUser);
+            },
+
+            _handleAuthenticationSuccess: function( _event ) {
+                const userProfile = _event.detail.loggedInUser;
+                const sessionData = {
+                    "timestamp" : Date.now(),
+                    "userProfile": userProfile,
+                };
+
+                const encodedData = window.btoa(JSON.stringify(sessionData));
+                localStorage.setItem("bpSessionData", encodedData);
+
+                this.set('loggedInUser', userProfile);
+            },
+
+            ready: function() {
+                const encodedData = localStorage.getItem("bpSessionData"),
+                      sessionData = encodedData ? JSON.parse(window.atob(encodedData)) : null;
+
+                if ( sessionData ) {
+                    this.set('loggedInUser', sessionData.userProfile);
+                }
+            }
         });
     </script>
 </dom-module>
