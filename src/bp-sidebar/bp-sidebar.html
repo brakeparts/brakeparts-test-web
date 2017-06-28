@@ -17,7 +17,7 @@
     <template>
         <style is="custom-style" include="iron-flex">
             paper-button {
-                padding: 4px;
+                padding-bottom: 2px;
                 font-size: 15px;
             }
             paper-card {
@@ -35,52 +35,31 @@
                     text-transform: uppercase;
                     padding: 10px;
                 }
-
             }
-            .bp-nav-item {
-                color: #000000;
-                text-transform: uppercase;
-                justify-content: center;
 
-            }
             .card-actions {
                 padding: 8px 0 0 0!important;
                 text-align: center;
                 color:#db4437;
                 font-weight: bold;
             }
-            .no-padding  {
+            .contact  {
                 padding: 0;
                 font-size: 13px;
+
             }
-            .no-padding iron-icon {
-                margin-right: 8px;
+            .contact iron-icon {
+                margin: 8px 8px 8px 8px;
                 color: #db4437;
-            }
-            .paper-item-link{
-                text-decoration: none;
             }
 
         </style>
-        <div class="vertical layout">
-            <paper-card heading="Groups">
-                <div role="listbox">
-                    <a class="paper-item-link" href="#inbox" tabindex="-1">
-                        <paper-item class="bp-nav-item">Retenes</paper-item>
-                    </a>
-                    <a class="paper-item-link" href="#starred" tabindex="-1">
-                        <paper-item class="bp-nav-item">Frenos</paper-item>
-                    </a>
-                    <a class="paper-item-link" href="#sent" tabindex="-1">
-                        <paper-item class="bp-nav-item">Orings</paper-item>
-                    </a>
-                </div>
-            </paper-card>
-            <paper-card heading="Busqueda">
+
+            <paper-card heading="Filtro">
                 <div class="card-content">
                     <eip-autocomplete-input
-                            id="group_autocomplete"
-                            label="Grupo"
+                            id="piece_autocomplete"
+                            label="Pieza"
                             list="[[_mapPhoneNumberList(phoneNumberList.*, currentLocation.groupId)]]"
                             value="{{value}}"
                             search-text="[[value]]"
@@ -89,7 +68,7 @@
                             show-clear>
                     </eip-autocomplete-input>
                     <eip-autocomplete-input
-                            id="brand_autocomplete"
+                            id="maker_autocomplete"
                             label="Marca"
                             list="[[_mapPhoneNumberList(phoneNumberList.*, currentLocation.groupId)]]"
                             value="{{value}}"
@@ -125,25 +104,21 @@
                 </div>
             </paper-card>
 
-
-            <paper-card heading="Contactanos">
-                <div class="card-content">
-                    <paper-item class="no-padding">
-                        <iron-icon icon="communication:location-on" ></iron-icon>
-                        Gral Acha #670
-                    </paper-item>
-                    <paper-item class="no-padding">
-                        <iron-icon icon="communication:phone"></iron-icon>
-                        72252840
-                    </paper-item>
-                    <paper-item class="no-padding">
-                        <iron-icon icon="communication:email"></iron-icon>
-                        brake_parts@hotmail.com
-                    </paper-item>
+            <div class="contact" >
+                <div>
+                    <iron-icon icon="communication:location-on" ></iron-icon>
+                    Gral Acha #670
                 </div>
-            </paper-card>
+                <div>
+                    <iron-icon icon="communication:phone"></iron-icon>
+                    72252840
+                </div>
+               <div>
+                   <iron-icon icon="communication:email"></iron-icon>
+                   brake_parts@hotmail.com
+                </div>
+            </div>
 
-        </div>
     </template>
 
     <!-- Javascript -->

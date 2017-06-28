@@ -32,18 +32,20 @@
         }
 
         #search_input {
-
+            color: #ffffff;
         }
 
         #search_label {
             color: #ffffff;
             opacity: 0.3;
+            margin-top: 6px;
         }
 
         paper-input-container {
             padding: 4px 4px 4px 8px;
             border-radius: 8px;
             background-color: rgba(255,255,255,0.2);
+
         }
     </style>
     <template>
@@ -64,7 +66,7 @@
                     prefix>
                 </iron-icon>
                 <paper-tooltip for="active_category_1">[[activeCategory.categoryName]]</paper-tooltip>
-                <label id="search_label">Search</label>
+                <label id="search_label">Search by Make Model Year, Product Type, Part Number or Brand</label>
                 <input id="search_input" is="iron-input" bind-value="{{searchText}}">
                 <paper-icon-button icon="arrow-drop-down" on-tap="_openAdvancedOptions" style$="visibility:[[_computeAdvancedArrowVisibility(_showAdvancedArrow)]]" suffix></paper-icon-button>
             </paper-input-container>
