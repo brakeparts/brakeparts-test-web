@@ -1,0 +1,21 @@
+{
+  "size-list": [
+
+    {"id" :1,"size" : "interior"},
+    {"id" :2,"size" : "interior2"},
+    {"id" :3,"size" : "exterior"},
+    {"id" :4,"size" : "exterior2"},
+    {"id" :5,"size" : "altura"},
+    {"id" :6,"size" : "altura2"},
+    {"id" :7,"size" : "largo"},
+    {"id" :8,"size" : "ancho"},
+    {"id" :9,"size" : "diametro"},
+    {"id" :10,"size" : "radio"},
+    {"id" :11,"size" : "litro"},
+    {"id" :12,"size" : "kilo"},
+    {"id" :13,"size" : "rosca"},
+    {"id" :14,"size" : "dientes"},
+    {"id" :15,"size" : "cilindrada"}
+
+  ]
+}

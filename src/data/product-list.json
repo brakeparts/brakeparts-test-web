@@ -1,0 +1,20 @@
+{
+  "product-list": [
+
+    {
+      "id" : 1,
+      "code" : "T1173",
+      "codeOEM" : "90311-35013",
+      "codeEQ" : "T1318",
+      "brand" : "MUSASHI",
+      "piece" : "RETENES",
+      "industry" : "JAPONES",
+      "price" : 1.5,
+      "netPrice" : 2,
+      "wholesalePrice" : 3,
+      "salePrice" : 4
+
+    }
+
+  ]
+}
